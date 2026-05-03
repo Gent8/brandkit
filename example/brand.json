@@ -1,0 +1,12 @@
+{
+  "name": "Acme Co",
+  "palette": ["#FAFAF9", "#5B21B6", "#10B981", "#F43F5E", "#1C1917"],
+  "paletteTokens": {
+    "bg": "#FAFAF9",
+    "primary": "#5B21B6",
+    "accent": "#10B981",
+    "warn": "#F43F5E",
+    "ink": "#1C1917"
+  },
+  "negativePrompt": ["leaves", "plants", "sparkles"]
+}

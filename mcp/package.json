@@ -1,0 +1,10 @@
+{
+  "name": "brandkit-mcp",
+  "version": "0.2.0",
+  "description": "MCP server exposing brandkit recolor, verify, and gen pipeline. https://github.com/gent8/brandkit",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  }
+}

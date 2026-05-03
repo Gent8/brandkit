@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+assets/_raw/
+assets/_svg/
+assets/candidates.html
+*.log
+.DS_Store
+.idea/
+.vscode/
+website/dist/
+website/.wrangler/
