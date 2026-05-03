@@ -1,23 +1,55 @@
 # brandkit
 
-> Palette-locked brand asset pipeline. One `brand.json`, one source SVG → every standard asset (icons, favicon, OG image, Chrome Web Store tiles), with a hard guarantee that every shipped color is in your palette.
+**AI image models ignore your hex palette.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that fixes this downstream: vectorize, snap every color to your palette, **drop anything that doesn't pass `verify`**.
 
-CLI + MCP server. Works with any Claude / Anthropic / MCP-compatible agent.
+```bash
+$ brandkit verify dist/logo.svg --brand brand.json
+✗ dist/logo.svg — 48 offender(s):
+  rgb(53,68,70) → suggest #1C1917
+  rgb(124,94,204) → suggest #5B21B6
+  ...
+$ echo $?
+1
 
-[brandkit.run](https://brandkit.run) · [GitHub](https://github.com/gent8/brandkit) · AGPL-3.0
+$ brandkit recolor dist/logo.svg --brand brand.json -o dist/logo.locked.svg
+$ brandkit verify dist/logo.locked.svg --brand brand.json
+✓ dist/logo.locked.svg — all colors in palette (5)
+```
 
-## Why
+Use `verify` as a CI gate. Use `recolor` as a pure SVG-in/SVG-out transform. Use `gen` for the full prompt → palette-locked SVG pipeline. Every tool is also exposed over MCP, so any Claude / Anthropic-SDK / MCP-compatible agent can call them inline.
 
-Generic image models drift off your hex palette and ignore negative prompts. Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft for "no text" and you'll get text. Then you have to vectorize the raster yourself.
+[brandkit.run](https://brandkit.run) · [GitHub](https://github.com/gent8/brandkit) · AGPL-3.0 · Node ≥ 20
 
-brandkit fixes all three downstream:
+## What's actually different
 
-1. **Generate** with the palette as a strong hint (Ideogram v3 via fal.ai)
-2. **Vectorize** the raster output (Recraft API)
-3. **Recolor** every hex/rgb in the SVG to the nearest palette member
-4. **Verify** — drop any candidate that still has off-palette colors
+Two things matter, both verifiable:
 
-The same recolor + verify primitives also run as an MCP tool — any Claude Code / Anthropic-API session can call `brandkit_recolor` and `brandkit_verify` against any SVG and palette.
+**1. brandkit closes the palette gate.** Same source raster, fed through "vectorize only" vs "vectorize + recolor + verify":
+
+| Pipeline | `verify` exit | Off-palette colors |
+|---|---|---|
+| Vectorize-only (Recraft on the raster) | `1` | **48** |
+| **brandkit (vectorize + recolor + verify)** | `0` | **0** ✓ |
+
+Numbers from `brandkit verify` against the [checked-in fixtures](website/assets/comparison/). See [`src/palette.js`](src/palette.js) and [`src/verify.js`](src/verify.js).
+
+**2. brandkit is one command, end to end.** Other tools stop somewhere before "ship-ready":
+
+| Tool | Steps to ship-ready palette-locked SVG + asset bundle | Steps |
+|---|---|---|
+| DALL-E 3 / Nano Banana 2 / Midjourney v7 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
+| Recraft v3 (vector) | gen vector (off-palette) · recolor · verify · render every asset size | 4 |
+| Raw Ideogram v3 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
+| **brandkit** | `brandkit gen` then `brandkit export` (or one MCP call for the gen part) | **1–2** |
+
+`brandkit export` writes 14 files from one source SVG: icons (16/32/48/128), favicon (svg + multi-res ico), apple-touch-icon, android-chrome (192/512), maskable-512, og-image (1200×630), and the three Chrome Web Store assets. All palette-locked, no manual rasterization step.
+
+## How the pipeline works
+
+1. **Generate** — provider call with palette as a strong hint (Ideogram v3 via fal.ai by default).
+2. **Vectorize** — raster → SVG (Recraft API by default).
+3. **Recolor** — every `#hex` and `rgb()` in the SVG snapped to the nearest palette member.
+4. **Verify** — drop any candidate that still has off-palette colors. Exit `1` on drift.
 
 ## Install
 
