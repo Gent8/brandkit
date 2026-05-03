@@ -62,7 +62,7 @@ Numbers from `brandkit verify` against the [checked-in fixtures](website/assets/
 ### CLI (npm)
 
 ```bash
-npm install -g brandkit
+npm install -g @gent8/brandkit
 brandkit --help
 ```
 

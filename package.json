@@ -1,5 +1,5 @@
 {
-  "name": "brandkit",
+  "name": "@gent8/brandkit",
   "version": "0.2.0",
   "description": "Palette-locked brand asset pipeline — recolor, verify, export, and generate from one brand.json. CLI + MCP server.",
   "type": "module",
