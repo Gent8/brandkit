@@ -1,5 +1,11 @@
 # brandkit
 
+<p align="center">
+  <a href="https://brandkit.run">
+    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/website/assets/demo/readme-hero.png" alt="brandkit — AI image models ignore your hex palette. brandkit doesn't. Same source raster vectorized produces 48 off-palette colors; brandkit produces 0." width="720">
+  </a>
+</p>
+
 **AI image models ignore your hex palette.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that fixes this downstream: vectorize, snap every color to your palette, **drop anything that doesn't pass `verify`**.
 
 ```bash

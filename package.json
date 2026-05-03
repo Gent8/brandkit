@@ -5,12 +5,16 @@
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "homepage": "https://brandkit.run",
+  "author": "gent8 (https://gent8.com)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gent8/brandkit.git"
+    "url": "git+https://github.com/Gent8/brandkit.git"
   },
   "bugs": {
-    "url": "https://github.com/gent8/brandkit/issues"
+    "url": "https://github.com/Gent8/brandkit/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "mcp",
