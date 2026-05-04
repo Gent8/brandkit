@@ -8,12 +8,6 @@
 
 <p align="center"><strong>Brand drift as a build failure.</strong></p>
 
-<p align="center">
-  <a href="https://brandkit.run">
-    <img src="media/readme-hero.png" alt="brandkit — same source raster vectorized produces 48 off-palette colors; brandkit produces 0. brandkit verify exits 1 on any drift." width="720">
-  </a>
-</p>
-
 **The CI gate for AI-generated brand assets.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that closes the loop: vectorize, snap every color to your palette, **exit 1 on anything that doesn't pass `verify`**.
 
 ```bash
