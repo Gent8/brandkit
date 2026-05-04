@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://brandkit.run">
-    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/media/logo.svg" alt="brandkit" width="96" height="96">
+    <img src="media/logo.svg" alt="brandkit" width="96" height="96">
   </a>
 </p>
 
@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://brandkit.run">
-    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/media/readme-hero.png" alt="brandkit — same source raster vectorized produces 48 off-palette colors; brandkit produces 0. brandkit verify exits 1 on any drift." width="720">
+    <img src="media/readme-hero.png" alt="brandkit — same source raster vectorized produces 48 off-palette colors; brandkit produces 0. brandkit verify exits 1 on any drift." width="720">
   </a>
 </p>
 
