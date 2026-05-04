@@ -3,6 +3,7 @@
 // (which returns the result inline — no shared filesystem needed).
 
 import { recolorSvg, verifySvg, normalizePalette } from "./palette.js";
+import { trimSvg } from "./trim.js";
 import * as fal from "./providers/fal.js";
 import * as replicate from "./providers/replicate.js";
 import * as recraft from "./providers/recraft.js";
@@ -83,7 +84,14 @@ export async function runPipeline(opts) {
       dropped.push({ name: baseName, reason: "off_palette", offenders });
       continue;
     }
-    const survivor = { name: baseName, svg: recolored };
+    let trimmed;
+    try {
+      trimmed = trimSvg(recolored, { stripBackground: true });
+    } catch (e) {
+      dropped.push({ name: baseName, reason: "trim_failed", error: e.message });
+      continue;
+    }
+    const survivor = { name: baseName, svg: trimmed };
     if (opts.includeRasters) {
       survivor.raster_base64 = r.buffer.toString("base64");
     }

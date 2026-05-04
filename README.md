@@ -1,18 +1,20 @@
 <p align="center">
   <a href="https://brandkit.run">
-    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/website/assets/brand/logo.svg" alt="brandkit" width="96" height="96">
+    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/media/logo.svg" alt="brandkit" width="96" height="96">
   </a>
 </p>
 
 <h1 align="center">brandkit</h1>
 
+<p align="center"><strong>Brand drift as a build failure.</strong></p>
+
 <p align="center">
   <a href="https://brandkit.run">
-    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/website/assets/demo/readme-hero.png" alt="brandkit — AI image models ignore your hex palette. brandkit doesn't. Same source raster vectorized produces 48 off-palette colors; brandkit produces 0." width="720">
+    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/media/readme-hero.png" alt="brandkit — same source raster vectorized produces 48 off-palette colors; brandkit produces 0. brandkit verify exits 1 on any drift." width="720">
   </a>
 </p>
 
-**AI image models ignore your hex palette.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that fixes this downstream: vectorize, snap every color to your palette, **drop anything that doesn't pass `verify`**.
+**The CI gate for AI-generated brand assets.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that closes the loop: vectorize, snap every color to your palette, **exit 1 on anything that doesn't pass `verify`**.
 
 ```bash
 $ brandkit verify dist/logo.svg --brand brand.json
@@ -30,7 +32,7 @@ $ brandkit verify dist/logo.locked.svg --brand brand.json
 
 Use `verify` as a CI gate. Use `recolor` as a pure SVG-in/SVG-out transform. Use `gen` for the full prompt → palette-locked SVG pipeline. Every tool is also exposed over MCP, so any Claude / Anthropic-SDK / MCP-compatible agent can call them inline.
 
-[brandkit.run](https://brandkit.run) · [GitHub](https://github.com/gent8/brandkit) · AGPL-3.0 · Node ≥ 20
+[brandkit.run](https://brandkit.run) · [GitHub](https://github.com/gent8/brandkit) · Apache-2.0 · Node ≥ 20
 
 ## What's actually different
 
@@ -43,7 +45,7 @@ Two things matter, both verifiable:
 | Vectorize-only (Recraft on the raster) | `1` | **48** |
 | **brandkit (vectorize + recolor + verify)** | `0` | **0** ✓ |
 
-Numbers from `brandkit verify` against the [checked-in fixtures](website/assets/comparison/). See [`src/palette.js`](src/palette.js) and [`src/verify.js`](src/verify.js).
+Numbers from `brandkit verify` against the [checked-in fixtures](media/comparison/). See [`src/palette.js`](src/palette.js).
 
 **2. brandkit is one command, end to end.** Other tools stop somewhere before "ship-ready":
 
@@ -62,6 +64,7 @@ Numbers from `brandkit verify` against the [checked-in fixtures](website/assets/
 2. **Vectorize** — raster → SVG (Recraft API by default).
 3. **Recolor** — every `#hex` and `rgb()` in the SVG snapped to the nearest palette member.
 4. **Verify** — drop any candidate that still has off-palette colors. Exit `1` on drift.
+5. **Trim** — vectorizers pad the mark inside a much larger square; trim rewrites the root viewBox to the rendered geometry bbox so favicons, og-images, and print all fill their canvas.
 
 ## Install
 
@@ -137,6 +140,12 @@ Snap every hex in the SVG to the nearest palette color. 3-digit hex auto-expande
 
 Exit `0` if every color is in the palette, `1` with a list of offenders otherwise. Use as a precommit / CI gate.
 
+### `brandkit trim <input.svg> [-o out.svg] [--pad <pct>] [--strip-bg]`
+
+Tighten the root viewBox to the rendered geometry bbox so the mark fills its canvas at every output size. Rewrites `preserveAspectRatio` to `xMidYMid meet` and drops fixed `width`/`height` so consumers can size via container. Pure SVG-in / SVG-out, idempotent. `--strip-bg` also removes shapes that fill the entire viewBox (typically vectorizer-added background rects).
+
+Why this exists: vectorizers (Recraft, vectorizer.ai) emit marks padded inside a much larger square — easily 40–60% empty. Run on a vectorize output before `brandkit export` and every favicon, og-image, and print render fills its canvas instead of inheriting the padding. Wired into `brandkit gen` automatically; standalone for SVGs that came from elsewhere.
+
 ### `brandkit export <input.svg> [--brand brand.json] [--out ./assets] [--bg <hex>]`
 
 From one source SVG, produces:
@@ -186,6 +195,7 @@ When run as an MCP server, three tools are exposed:
 - **`brandkit_gen(prompt, palette, count?, extraNegative?, dryRun?)`** — full pipeline in one call. Returns survivor SVGs inline as text. No filesystem handoff needed.
 - **`brandkit_recolor(svg, palette)`** — pure text-in/text-out. Snaps every hex AND `rgb()`/`rgba()` color to the nearest palette member.
 - **`brandkit_verify(svg, palette)`** — pure text-in/JSON-out gate; reports off-palette offenders with normalized hex + suggestion.
+- **`brandkit_trim(svg, padPct?, stripBackground?, keepDimensions?)`** — pure text-in/text-out. Rewrites the root viewBox to the rendered geometry bbox so the mark fills its canvas. Set `stripBackground=true` to drop vectorizer-added canvas-fill rects.
 
 `recolor`/`verify` accept both `#hex` and `rgb()` color forms (Recraft's vectorize output uses `rgb()`). Named CSS colors and `hsl()` are still rejected.
 
@@ -222,4 +232,4 @@ See [brandkit.run](https://brandkit.run) for a side-by-side: same prompt, same p
 
 ## License
 
-[AGPL-3.0-or-later](LICENSE). If you wrap brandkit in a hosted service, your modifications must be released under the same terms.
+[Apache-2.0](LICENSE). Use it commercially, embed it, fork it — the only ask is that you keep the copyright notice and the license file.

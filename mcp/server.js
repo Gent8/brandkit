@@ -6,10 +6,11 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { recolorSvg, verifySvg } from "./palette.js";
+import { trimSvg } from "./trim.js";
 import { runPipeline, describePipeline } from "./pipeline.js";
 
 const server = new Server(
-  { name: "brandkit", version: "0.2.0" },
+  { name: "brandkit", version: "0.3.0" },
   { capabilities: { tools: {} } },
 );
 
@@ -41,6 +42,30 @@ const TOOLS = [
       properties: {
         svg: { type: "string" },
         palette: { type: "array", items: { type: "string" } },
+      },
+    },
+  },
+  {
+    name: "brandkit_trim",
+    description:
+      "Tighten the root viewBox of an SVG to the rendered geometry bbox so the mark fills its canvas at every output size. Vectorizers (Recraft, vectorizer.ai) emit marks padded inside a much larger square — every favicon and og-image inherits that padding and renders tiny. Trim fixes that. Returns the rewritten SVG as text. SVG-in / SVG-out, no network. Set stripBackground=true to also drop vectorizer-added canvas-fill rects.",
+    inputSchema: {
+      type: "object",
+      required: ["svg"],
+      properties: {
+        svg: { type: "string", description: "Full SVG source" },
+        padPct: {
+          type: "number",
+          description: "Padding around the trimmed bbox as a percentage of max(w,h). Default 4.",
+        },
+        stripBackground: {
+          type: "boolean",
+          description: "Remove shapes that fill the entire viewBox (typically vectorizer-added background rects). Default false.",
+        },
+        keepDimensions: {
+          type: "boolean",
+          description: "Keep fixed width/height attributes on the root <svg>. Default false (drop them so consumers size via container).",
+        },
       },
     },
   },
@@ -104,6 +129,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     if (name === "brandkit_verify") {
       const result = verifySvg(args.svg, args.palette);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    }
+    if (name === "brandkit_trim") {
+      const out = trimSvg(args.svg, {
+        padPct: args.padPct,
+        stripBackground: !!args.stripBackground,
+        keepDimensions: !!args.keepDimensions,
+      });
+      return { content: [{ type: "text", text: out }] };
     }
     if (name === "brandkit_gen") {
       const opts = {

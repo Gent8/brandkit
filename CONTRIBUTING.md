@@ -35,4 +35,4 @@ The smoke test in `test-fixtures/smoke.mjs` is intentionally tiny. Add cases the
 
 ## License
 
-By contributing, you agree your contribution is licensed under [AGPL-3.0-or-later](LICENSE).
+By contributing, you agree your contribution is licensed under [Apache-2.0](LICENSE).

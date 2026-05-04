@@ -1,9 +1,9 @@
 {
   "name": "@gent8/brandkit",
-  "version": "0.2.0",
-  "description": "Palette-locked brand asset pipeline — recolor, verify, export, and generate from one brand.json. CLI + MCP server.",
+  "version": "0.3.0",
+  "description": "Brand drift as a build failure — palette-locked SVG pipeline (recolor, verify, trim, export, generate) with a CI gate. CLI + MCP server.",
   "type": "module",
-  "license": "AGPL-3.0-or-later",
+  "license": "Apache-2.0",
   "homepage": "https://brandkit.run",
   "author": "gent8 (https://gent8.com)",
   "repository": {

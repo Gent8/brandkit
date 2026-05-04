@@ -3,6 +3,7 @@ import { cac } from "cac";
 import { readFileSync, writeFileSync } from "node:fs";
 import { loadBrand } from "../src/brand.js";
 import { recolorSvg, verifySvg } from "../src/palette.js";
+import { trimSvg } from "../src/trim.js";
 
 const cli = cac("brandkit");
 
@@ -17,6 +18,22 @@ cli
     const dest = opts.output || input;
     writeFileSync(dest, out);
     console.log(`recolored → ${dest}`);
+  });
+
+cli
+  .command("trim <input>", "Trim the root viewBox to the rendered geometry bbox so the mark fills its canvas")
+  .option("-o, --output <path>", "Output path (default: overwrite input)")
+  .option("--pad <pct>", "Padding around the trimmed bbox, % of max(w,h)", { default: 4 })
+  .option("--strip-bg", "Remove canvas-filling shapes (e.g. vectorizer-added background rects)")
+  .action((input, opts) => {
+    const svg = readFileSync(input, "utf8");
+    const out = trimSvg(svg, {
+      padPct: Number(opts.pad),
+      stripBackground: !!opts.stripBg,
+    });
+    const dest = opts.output || input;
+    writeFileSync(dest, out);
+    console.log(`trimmed → ${dest}`);
   });
 
 cli
@@ -67,7 +84,7 @@ cli
   });
 
 cli.help();
-cli.version("0.2.0");
+cli.version("0.3.0");
 
 // cac doesn't propagate async action errors through cli.parse(),
 // so we install a global rejection handler too.

@@ -7,8 +7,9 @@ WORKDIR /app
 COPY mcp/package.json ./package.json
 RUN npm install --omit=dev --no-audit --no-fund
 
-# brandkit core (palette + pipeline + providers) — same source as the CLI.
+# brandkit core (palette + trim + pipeline + providers) — same source as the CLI.
 COPY src/palette.js ./palette.js
+COPY src/trim.js ./trim.js
 COPY src/pipeline.js ./pipeline.js
 COPY src/providers/ ./providers/
 

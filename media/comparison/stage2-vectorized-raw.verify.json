@@ -1,0 +1,35 @@
+{
+  "ok": false,
+  "offenders": [
+    {
+      "kind": "off-palette",
+      "value": "rgb(247,247,247)",
+      "normalized": "#F7F7F7",
+      "suggestion": "#FAFAF9"
+    },
+    {
+      "kind": "off-palette",
+      "value": "rgb(98,45,191)",
+      "normalized": "#622DBF",
+      "suggestion": "#5B21B6"
+    },
+    {
+      "kind": "off-palette",
+      "value": "rgb(29,185,138)",
+      "normalized": "#1DB98A",
+      "suggestion": "#10B981"
+    },
+    {
+      "kind": "off-palette",
+      "value": "rgb(35,33,36)",
+      "normalized": "#232124",
+      "suggestion": "#1C1917"
+    },
+    {
+      "kind": "off-palette",
+      "value": "rgb(240,75,109)",
+      "normalized": "#F04B6D",
+      "suggestion": "#F43F5E"
+    }
+  ]
+}
