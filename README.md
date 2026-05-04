@@ -1,4 +1,10 @@
-# brandkit
+<p align="center">
+  <a href="https://brandkit.run">
+    <img src="https://raw.githubusercontent.com/Gent8/brandkit/main/website/assets/brand/logo.svg" alt="brandkit" width="96" height="96">
+  </a>
+</p>
+
+<h1 align="center">brandkit</h1>
 
 <p align="center">
   <a href="https://brandkit.run">
