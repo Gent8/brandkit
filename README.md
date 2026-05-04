@@ -8,6 +8,22 @@
 
 <p align="center"><strong>Brand drift as a build failure.</strong></p>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/@gent8/brandkit"><img alt="npm" src="https://img.shields.io/npm/v/@gent8/brandkit?color=5B21B6&label=npm"></a>
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-1C1917"></a>
+  <img alt="node" src="https://img.shields.io/badge/node-%E2%89%A520-10B981">
+  <img alt="MCP" src="https://img.shields.io/badge/MCP-ready-F43F5E">
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#cli-commands">CLI</a> ·
+  <a href="#mcp-tools">MCP</a> ·
+  <a href="#brandjson">brand.json</a> ·
+  <a href="#example-session">Example</a> ·
+  <a href="https://brandkit.run">brandkit.run</a>
+</p>
+
 **The CI gate for AI-generated brand assets.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that closes the loop: vectorize, snap every color to your palette, **exit 1 on anything that doesn't pass `verify`**.
 
 ```bash
@@ -26,13 +42,24 @@ $ brandkit verify dist/logo.locked.svg --brand brand.json
 
 Use `verify` as a CI gate. Use `recolor` as a pure SVG-in/SVG-out transform. Use `gen` for the full prompt → palette-locked SVG pipeline. Every tool is also exposed over MCP, so any Claude / Anthropic-SDK / MCP-compatible agent can call them inline.
 
-[brandkit.run](https://brandkit.run) · [GitHub](https://github.com/gent8/brandkit) · Apache-2.0 · Node ≥ 20
-
 ## What's actually different
 
-Two things matter, both verifiable:
+Two things matter, both verifiable.
 
 **1. brandkit closes the palette gate.** Same source raster, fed through "vectorize only" vs "vectorize + recolor + verify":
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="media/comparison/stage1-raw-raster.png" alt="raw raster" width="220"></td>
+    <td align="center" width="33%"><img src="media/comparison/stage2-vectorized-raw.svg" alt="vectorize-only" width="220"></td>
+    <td align="center" width="33%"><img src="media/comparison/stage3-brandkit-final.svg" alt="brandkit final" width="220"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>raw raster</b><br/>source from generator</sub></td>
+    <td align="center"><sub><b>vectorize only</b><br/><code>verify</code> ✗ — 48 off-palette</sub></td>
+    <td align="center"><sub><b>brandkit</b><br/><code>verify</code> ✓ — 0 off-palette</sub></td>
+  </tr>
+</table>
 
 | Pipeline | `verify` exit | Off-palette colors |
 |---|---|---|
@@ -126,6 +153,14 @@ The `palette` array is the law. Anything outside it gets snapped to the nearest 
 
 ## CLI commands
 
+| Command | What it does | Side effects |
+|---|---|---|
+| [`recolor`](#brandkit-recolor-inputsvg---brand-brandjson--o-outsvg) | Snap every color in an SVG to the nearest palette member | SVG-in / SVG-out |
+| [`verify`](#brandkit-verify-inputsvg---brand-brandjson) | Exit `1` on any off-palette color — use as CI gate | None (read-only) |
+| [`trim`](#brandkit-trim-inputsvg--o-outsvg---pad-pct---strip-bg) | Tighten root viewBox so the mark fills its canvas | SVG-in / SVG-out |
+| [`export`](#brandkit-export-inputsvg---brand-brandjson---out-assets---bg-hex) | One SVG → 14 ship-ready assets (icons, favicons, og-image, CWS) | Writes files |
+| [`gen`](#brandkit-gen---prompt----brand-brandjson---out-assets---count-4---dry-run) | Full pipeline: prompt → palette-locked SVG candidates | API calls + files |
+
 ### `brandkit recolor <input.svg> [--brand brand.json] [-o out.svg]`
 
 Snap every hex in the SVG to the nearest palette color. 3-digit hex auto-expanded. Errors on `hsl()` or named colors with a list of offenders — convert those upstream first. Idempotent.
@@ -218,7 +253,8 @@ brandkit verify dist/logo.svg --brand brand.json   # exit 1 on drift
 
 ## Status
 
-Solo-maintained, best-effort. See [STATUS.md](STATUS.md). Issues may sit; PRs are read on a slow cadence.
+> [!NOTE]
+> Solo-maintained, best-effort. See [STATUS.md](STATUS.md). Issues may sit; PRs are read on a slow cadence.
 
 ## Comparison
 
