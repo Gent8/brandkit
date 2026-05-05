@@ -1,6 +1,6 @@
 {
   "name": "@gent8/brandkit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "One SVG → 14 ship-ready brand assets (favicon, og-image, PWA icons, Chrome Web Store) — all palette-locked to brand.json. CLI + MCP server with a CI gate that exits 1 on any off-palette color.",
   "type": "module",
   "license": "Apache-2.0",

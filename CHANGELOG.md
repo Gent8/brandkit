@@ -2,6 +2,13 @@
 
 All notable changes to brandkit are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-05-05
+
+### Changed
+
+- **Repositioned around the bundle.** Tagline: *"One SVG in. Every surface out. Palette-locked."* The bundle (one source SVG → 14 ship-ready files) is the headline pitch; `verify` is framed as the CI gate that proves it. README opening rewritten; "What's actually different" reordered to lead with bundle scope vs `pwa-asset-generator` / RealFaviconGenerator / Looka rather than palette accuracy.
+- **package.json `description` and `keywords`** updated for npm discoverability — adds `favicon`, `favicon-generator`, `og-image`, `pwa-icons`, `asset-bundle`, `brand-assets`, `brand-kit`, `design-system`. No code changes; this release exists to ship the new metadata to npm.
+
 ## [0.3.0] — 2026-05-04
 
 ### Added
@@ -34,5 +41,6 @@ All notable changes to brandkit are recorded here. The format follows [Keep a Ch
 - MCP server (`mcp/`) exposing `brandkit_recolor`, `brandkit_verify`, `brandkit_gen` over stdio JSON-RPC.
 - Pluggable provider interface: `fal` and `replicate` (stub) for image generation; `recraft` and `vectorizer` (stub) for vectorization.
 
+[0.3.1]: https://github.com/Gent8/brandkit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Gent8/brandkit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Gent8/brandkit/releases/tag/v0.2.0
