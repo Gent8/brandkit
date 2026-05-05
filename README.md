@@ -6,7 +6,7 @@
 
 <h1 align="center">brandkit</h1>
 
-<p align="center"><strong>Brand drift as a build failure.</strong></p>
+<p align="center"><strong>One SVG in. Every surface out. Palette-locked.</strong></p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@gent8/brandkit"><img alt="npm" src="https://img.shields.io/npm/v/@gent8/brandkit?color=5B21B6&label=npm"></a>
@@ -24,29 +24,35 @@
   <a href="https://brandkit.run">brandkit.run</a>
 </p>
 
-**The CI gate for AI-generated brand assets.** Ask Ideogram for `#5B21B6` and you'll get something close. Ask Recraft to vectorize and you'll get 48 off-palette colors. brandkit is a CLI + MCP server that closes the loop: vectorize, snap every color to your palette, **exit 1 on anything that doesn't pass `verify`**.
+**One source SVG → every asset you need to ship a brand.** brandkit is a CLI + MCP server that turns a single SVG into 14 standard files — favicon, apple-touch-icon, maskable PWA icon, og-image, Chrome Web Store assets — all palette-locked to your `brand.json`. The `verify` command is a CI gate: it exits `1` on any off-palette color, so a drift can't sneak into the bundle the same way ESLint catches a typo.
 
 ```bash
-$ brandkit verify dist/logo.svg --brand brand.json
-✗ dist/logo.svg — 48 offender(s):
-  rgb(53,68,70) → suggest #1C1917
-  rgb(124,94,204) → suggest #5B21B6
-  ...
-$ echo $?
-1
+$ brandkit export dist/logo.svg --brand brand.json --out ./assets
+✓ wrote 14 files to ./assets (icon-16.png … cws-marquee-920x680.png)
+✓ all colors in palette (5)
 
-$ brandkit recolor dist/logo.svg --brand brand.json -o dist/logo.locked.svg
-$ brandkit verify dist/logo.locked.svg --brand brand.json
-✓ dist/logo.locked.svg — all colors in palette (5)
+$ brandkit verify ./assets/og-image.png  # works on any output
+✓ all colors in palette
 ```
 
-Use `verify` as a CI gate. Use `recolor` as a pure SVG-in/SVG-out transform. Use `gen` for the full prompt → palette-locked SVG pipeline. Every tool is also exposed over MCP, so any Claude / Anthropic-SDK / MCP-compatible agent can call them inline.
+Use `export` to ship the bundle. Use `verify` as a CI gate. Use `recolor` as a pure SVG-in/SVG-out transform. Use `gen` for the full prompt → palette-locked SVG pipeline. Every tool is also exposed over MCP, so any Claude / Anthropic-SDK / MCP-compatible agent can call them inline.
 
 ## What's actually different
 
-Two things matter, both verifiable.
+**1. One command, every surface.** Other dev tools cover one slice (`pwa-asset-generator` does favicons, RealFaviconGenerator does favicons, AI logo SaaS gives you a brand kit but no CI hook). Nothing else gives you the full bundle from one SVG, palette-locked, scriptable:
 
-**1. brandkit closes the palette gate.** Same source raster, fed through "vectorize only" vs "vectorize + recolor + verify":
+| Tool | Steps to ship-ready palette-locked SVG + asset bundle | Steps |
+|---|---|---|
+| DALL-E 3 / Nano Banana 2 / Midjourney v7 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
+| Recraft v3 (vector) | gen vector (off-palette) · recolor · verify · render every asset size | 4 |
+| Raw Ideogram v3 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
+| RealFaviconGenerator / pwa-asset-generator | favicons only · no og-image · no palette enforcement · still need `verify` | 3+ |
+| Looka / Brandmark / LogoAI | rich brand kit but SaaS-locked · no CLI · no `verify` | n/a |
+| **brandkit** | `brandkit gen` then `brandkit export` (or one MCP call for the gen part) | **1–2** |
+
+`brandkit export` writes 14 files from one source SVG: icons (16/32/48/128), favicon (svg + multi-res ico), apple-touch-icon, android-chrome (192/512), maskable-512, og-image (1200×630), and the three Chrome Web Store assets. All palette-locked, no manual rasterization step.
+
+**2. The bundle is verified, not just generated.** Same source raster, fed through "vectorize only" vs "vectorize + recolor + verify":
 
 <table>
   <tr>
@@ -66,18 +72,7 @@ Two things matter, both verifiable.
 | Vectorize-only (Recraft on the raster) | `1` | **48** |
 | **brandkit (vectorize + recolor + verify)** | `0` | **0** ✓ |
 
-Numbers from `brandkit verify` against the [checked-in fixtures](media/comparison/). See [`src/palette.js`](src/palette.js).
-
-**2. brandkit is one command, end to end.** Other tools stop somewhere before "ship-ready":
-
-| Tool | Steps to ship-ready palette-locked SVG + asset bundle | Steps |
-|---|---|---|
-| DALL-E 3 / Nano Banana 2 / Midjourney v7 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
-| Recraft v3 (vector) | gen vector (off-palette) · recolor · verify · render every asset size | 4 |
-| Raw Ideogram v3 | gen raster · vectorize · recolor · verify · render every asset size | 5 |
-| **brandkit** | `brandkit gen` then `brandkit export` (or one MCP call for the gen part) | **1–2** |
-
-`brandkit export` writes 14 files from one source SVG: icons (16/32/48/128), favicon (svg + multi-res ico), apple-touch-icon, android-chrome (192/512), maskable-512, og-image (1200×630), and the three Chrome Web Store assets. All palette-locked, no manual rasterization step.
+The drift is 3–15 RGB points per color — invisible to the eye, but accumulates across favicon, og-image, print, merch, and breaks brand QA downstream. `verify` catches it at build time. Numbers from `brandkit verify` against the [checked-in fixtures](media/comparison/). See [`src/palette.js`](src/palette.js).
 
 ## How the pipeline works
 
